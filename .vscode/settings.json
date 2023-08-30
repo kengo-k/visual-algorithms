@@ -1,0 +1,52 @@
+{
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "files.eol": "\n",
+  
+    "editor.fontSize": 14,
+  
+    "editor.tabSize": 2,
+    "editor.insertSpaces": false,
+    "editor.renderWhitespace": "all",
+  
+    "editor.inlineSuggest.enabled": true,
+  
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    },
+    "prettier.tabWidth": 2,
+  
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "[javascriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "[scss]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "[markdown]": {
+      "editor.formatOnSave": false
+    }
+  }
