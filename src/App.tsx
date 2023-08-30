@@ -1,17 +1,13 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { animated, config, useSpring } from "react-spring";
 
-const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
+function App() {
+  const props = useSpring({
+    to: { transform: "translateX(100px)" },
+    from: { transform: "translateX(0px)" },
+    config: config.wobbly,
+  });
 
-const Home = () => {
-  return <div>Hello, React!!</div>;
-};
+  return <animated.div style={props}>I will move</animated.div>;
+}
 
 export default App;
