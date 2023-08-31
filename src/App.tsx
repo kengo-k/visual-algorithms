@@ -13,6 +13,7 @@ interface State {
     [value: string]: Location;
   };
   init: (values: number[]) => void;
+  move: (value: number, x: number, y: number) => void;
 }
 
 const useStore = create<State>((set) => ({
@@ -20,6 +21,18 @@ const useStore = create<State>((set) => ({
   locations: {},
   init: (values: number[]) => {
     set({ values });
+    const locations: State["locations"] = {};
+    for (const v of values) {
+      locations[v] = { x: 0, y: 0 };
+    }
+    set({ locations });
+  },
+  move: (value: number, x: number, y: number) => {
+    set((state) => {
+      const locations = { ...state.locations };
+      locations[value] = { x, y };
+      return { ...state, locations };
+    });
   },
 }));
 
@@ -28,7 +41,12 @@ interface BoxProps {
 }
 
 const Box: React.FC<BoxProps> = ({ value }) => {
-  const styles = useSpring({ transform: "translate3d(0, 0, 0)" });
+  const { locations } = useStore();
+  const loc = locations[value];
+  const styles = useSpring({
+    transform: `translate3d(${loc.x}px, ${loc.y}px, 0)`,
+  });
+  console.log("render", loc);
   return (
     <animated.div style={styles}>
       <div className="w-16 h-16 border border-black m-4 flex items-center justify-center bg-gradient-to-r from-blue-500 to-teal-500 text-white shadow-lg">
@@ -43,12 +61,19 @@ interface SimpleProps {
 }
 
 const Simple: React.FC<SimpleProps> = ({ values }) => {
+  const { move } = useStore();
+  const onClick = () => {
+    move(3, 100, 100);
+  };
   return (
-    <div className="flex">
-      {values.map((value, index) => (
-        <Box key={index} value={value} />
-      ))}
-    </div>
+    <>
+      <div className="flex">
+        {values.map((value) => (
+          <Box key={value} value={value} />
+        ))}
+      </div>
+      <button onClick={onClick}>click</button>
+    </>
   );
 };
 
