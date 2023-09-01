@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { animated, useSpring } from "react-spring";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 
 interface Location {
@@ -41,18 +41,18 @@ interface BoxProps {
 }
 
 const Box: React.FC<BoxProps> = ({ value }) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const { locations } = useStore();
   const loc = locations[value];
-  const styles = useSpring({
-    transform: `translate3d(${loc.x}px, ${loc.y}px, 0)`,
-  });
-  console.log("render", loc);
+  useEffect(() => {
+    setPosition((prev) => ({ x: prev.x + loc.x, y: prev.y + loc.y }));
+  }, [loc]);
   return (
-    <animated.div style={styles}>
+    <motion.div animate={position}>
       <div className="w-16 h-16 border border-black m-4 flex items-center justify-center bg-gradient-to-r from-blue-500 to-teal-500 text-white shadow-lg">
         {value}
       </div>
-    </animated.div>
+    </motion.div>
   );
 };
 
