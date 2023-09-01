@@ -2,6 +2,12 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 
+interface Element {
+  value: number;
+  x: number;
+  y: number;
+}
+
 interface Location {
   x: number;
   y: number;
@@ -40,6 +46,8 @@ interface BoxProps {
   value: number;
 }
 
+const size = 20;
+
 const Box: React.FC<BoxProps> = ({ value }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const { locations } = useStore();
@@ -49,27 +57,39 @@ const Box: React.FC<BoxProps> = ({ value }) => {
   }, [loc]);
   return (
     <motion.div animate={position}>
-      <div className="w-16 h-16 border border-black m-4 flex items-center justify-center bg-gradient-to-r from-blue-500 to-teal-500 text-white shadow-lg">
+      <div
+        className={`w-${size} h-${size} border-dashed border-2 border-sky-200 rounded-md bg-sky-50 flex items-center justify-center text-2xl font-bold text-blue-800`}
+      >
         {value}
       </div>
     </motion.div>
   );
 };
 
-interface SimpleProps {
-  values: number[];
+// interface SimpleProps {
+//   values: number[];
+// }
+
+function* myMove(
+  move: (value: number, x: number, y: number) => void,
+  values: number[]
+) {
+  const from = values.findIndex((v) => v === 1) + 1;
+  const to = values.findIndex((v) => v === 9) + 1;
+  move(1, 0, size * 4);
+  yield;
+  for (let i = from; i < to; i++) {
+    move(values[i], -size * 4, 0);
+  }
+  yield;
+  move(1, (to - from) * size * 4, -size * 4);
 }
 
-const Simple: React.FC<SimpleProps> = ({ values }) => {
-  const { move } = useStore();
+const Simple: React.FC = () => {
+  const { move, values } = useStore();
+  console.log("values:", values);
 
-  function* myMove() {
-    console.log("1");
-    yield move(3, 0, 200);
-    console.log("2");
-    yield move(3, 200, 0);
-  }
-  const [gen, setGen] = useState(myMove);
+  const [gen, setGen] = useState(myMove(move, values));
   const onClick = () => {
     let { done } = gen.next();
     if (done) {
@@ -78,8 +98,9 @@ const Simple: React.FC<SimpleProps> = ({ values }) => {
   };
 
   useEffect(() => {
-    setGen(myMove());
-  }, []);
+    setGen(myMove(move, values));
+  }, [values, move]);
+
   return (
     <>
       <div className="flex">
@@ -93,11 +114,11 @@ const Simple: React.FC<SimpleProps> = ({ values }) => {
 };
 
 function App() {
-  const { values, init } = useStore();
+  const { init } = useStore();
   useEffect(() => {
     init([3, 7, 1, 5, 2, 9, 8, 4, 6]);
   }, [init]);
-  return <Simple values={values} />;
+  return <Simple />;
 }
 
 export default App;
