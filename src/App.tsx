@@ -62,9 +62,24 @@ interface SimpleProps {
 
 const Simple: React.FC<SimpleProps> = ({ values }) => {
   const { move } = useStore();
+
+  function* myMove() {
+    console.log("1");
+    yield move(3, 0, 200);
+    console.log("2");
+    yield move(3, 200, 0);
+  }
+  const [gen, setGen] = useState(myMove);
   const onClick = () => {
-    move(3, 100, 100);
+    let { done } = gen.next();
+    if (done) {
+      console.log("done");
+    }
   };
+
+  useEffect(() => {
+    setGen(myMove());
+  }, []);
   return (
     <>
       <div className="flex">
