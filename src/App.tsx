@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { create } from "zustand";
 
+function* initRun() {}
+
 interface Element {
   value: number;
   x: number;
@@ -19,6 +21,8 @@ interface State {
     [value: string]: Location;
   };
   init: (values: number[]) => void;
+  run: Generator<undefined, void, unknown>;
+  setRun: (run: Generator<undefined, void, unknown>) => void;
   move: (value: number, x: number, y: number) => void;
 }
 
@@ -39,6 +43,10 @@ const useStore = create<State>((set) => ({
       locations[value] = { x, y };
       return { ...state, locations };
     });
+  },
+  run: initRun(),
+  setRun: (run: Generator<undefined, void, unknown>) => {
+    set({ run });
   },
 }));
 
@@ -66,40 +74,42 @@ const Box: React.FC<BoxProps> = ({ value }) => {
   );
 };
 
-// interface SimpleProps {
-//   values: number[];
-// }
-
 function* myMove(
   move: (value: number, x: number, y: number) => void,
-  values: number[]
+  values: number[],
+  fromValue: number,
+  toValue: number
 ) {
-  const from = values.findIndex((v) => v === 1) + 1;
-  const to = values.findIndex((v) => v === 9) + 1;
-  move(1, 0, size * 4);
+  console.log("fromValue", fromValue, "toValue", toValue);
+  const from = values.findIndex((v) => v === fromValue) + 1;
+  const to = values.findIndex((v) => v === toValue) + 1;
+  console.log("from", from, "to", to);
+  move(fromValue, 0, size * 4);
   yield;
   for (let i = from; i < to; i++) {
     move(values[i], -size * 4, 0);
   }
   yield;
-  move(1, (to - from) * size * 4, -size * 4);
+  move(fromValue, (to - from) * size * 4, -size * 4);
+  yield;
 }
 
 const Simple: React.FC = () => {
-  const { move, values } = useStore();
-  console.log("values:", values);
-
-  const [gen, setGen] = useState(myMove(move, values));
+  const { move, values, setRun, run } = useStore();
   const onClick = () => {
-    let { done } = gen.next();
-    if (done) {
-      console.log("done");
-    }
+    run.next();
   };
 
   useEffect(() => {
-    setGen(myMove(move, values));
-  }, [values, move]);
+    function* generator() {
+      console.log("values", values);
+      const g1 = myMove(move, values, 1, 9);
+      const g2 = myMove(move, values, 7, 4);
+      yield* g1;
+      yield* g2;
+    }
+    setRun(generator());
+  }, [values, move, setRun]);
 
   return (
     <>
