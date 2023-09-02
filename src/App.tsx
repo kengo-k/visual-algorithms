@@ -70,19 +70,11 @@ async function insert(
   let to = values.findIndex((v) => v === values[toIndex]);
   move(values[fromIndex], 0, size * 4);
   await sleep();
-  if (from > to) {
-    for (let i = to; i < from; i++) {
-      move(values[i], size * 4, 0);
-    }
-    await sleep();
-    move(values[fromIndex], -(from - to) * size * 4, -size * 4);
-  } else {
-    for (let i = from; i < to; i++) {
-      move(values[i], -size * 4, 0);
-    }
-    await sleep();
-    move(values[fromIndex], (to - from) * size * 4, -size * 4);
+  for (let i = to; i < from; i++) {
+    move(values[i], size * 4, 0);
   }
+  await sleep();
+  move(values[fromIndex], -(from - to) * size * 4, 0);
   await sleep();
 }
 
