@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 
 interface State {
@@ -38,13 +38,8 @@ const useStore = create<State>((set) => ({
 const size = 20;
 
 const Box: React.FC<{ value: number }> = ({ value }) => {
-  //const [position, setPosition] = useState({ x: 0, y: 0 });
   const { locations } = useStore();
   const loc = locations[value];
-  console.log("render box:", value, loc);
-  // useEffect(() => {
-  //   setPosition((prev) => ({ x: prev.x + loc.x, y: prev.y + loc.y }));
-  // }, [loc]);
   return (
     <motion.div animate={loc}>
       <div
@@ -80,7 +75,19 @@ async function insert(
 
 const Simple: React.FC = () => {
   const { move, values, index, init } = useStore();
+  const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => {
+    console.log(index, values);
+    if (index === values.length) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [values, index]);
+
   const onClick = async () => {
+    setDisabled(true);
     const newValues = [...values];
     const value = newValues[index];
     let j = index - 1;
@@ -91,16 +98,18 @@ const Simple: React.FC = () => {
     newValues[j + 1] = value;
     await insert(move, values, index, j + 1);
     init(newValues, index + 1);
+    setDisabled(false);
   };
 
-  console.log("render:", values);
   return (
     <>
       <div className="flex">
         {values.map((value) => (
-          <Box key={value} value={value} />
+          <Box key={`${value}-${index}`} value={value} />
         ))}
-        <button onClick={onClick}>click</button>
+        <button disabled={disabled} onClick={onClick}>
+          click
+        </button>
       </div>
     </>
   );
