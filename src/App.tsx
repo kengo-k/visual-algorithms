@@ -38,12 +38,13 @@ const useStore = create<State>((set) => ({
 const size = 20;
 
 const Box: React.FC<{ value: number }> = ({ value }) => {
+  console.log("render: ", value);
   const { locations } = useStore();
   const loc = locations[value];
   return (
     <motion.div animate={loc}>
       <div
-        className={`w-${size} h-${size} border-dashed border-2 border-sky-200 rounded-md bg-sky-50 flex items-center justify-center text-2xl font-bold text-blue-800`}
+        className={`w-${size} h-${size} border-2 border-sky-200 rounded-md bg-sky-50 flex items-center justify-center text-2xl font-bold text-blue-800`}
       >
         {value}
       </div>
@@ -52,7 +53,7 @@ const Box: React.FC<{ value: number }> = ({ value }) => {
 };
 
 const sleep = () => {
-  return new Promise((resolve) => setTimeout(resolve, 300));
+  return new Promise((resolve) => setTimeout(resolve, 200));
 };
 
 async function insert(
@@ -73,12 +74,12 @@ async function insert(
   await sleep();
 }
 
-const Simple: React.FC = () => {
+const InsertionSort: React.FC = () => {
   const { move, values, index, init } = useStore();
   const [disabled, setDisabled] = useState(false);
 
+  // Once the sorting is complete, the button should be deactivated thereafter
   useEffect(() => {
-    console.log(index, values);
     if (index === values.length) {
       setDisabled(true);
     } else {
@@ -86,7 +87,7 @@ const Simple: React.FC = () => {
     }
   }, [values, index]);
 
-  const onClick = async () => {
+  const onClick = async function () {
     setDisabled(true);
     const newValues = [...values];
     const value = newValues[index];
@@ -96,7 +97,9 @@ const Simple: React.FC = () => {
       j--;
     }
     newValues[j + 1] = value;
+    console.log("--- insert ---");
     await insert(move, values, index, j + 1);
+    console.log("--- re init ---");
     init(newValues, index + 1);
     setDisabled(false);
   };
@@ -104,8 +107,8 @@ const Simple: React.FC = () => {
   return (
     <>
       <div className="flex">
-        {values.map((value) => (
-          <Box key={`${value}-${index}`} value={value} />
+        {values.map((value, i) => (
+          <Box key={i < index ? `${value}-${i}` : value} value={value} />
         ))}
         <button disabled={disabled} onClick={onClick}>
           click
@@ -118,9 +121,10 @@ const Simple: React.FC = () => {
 function App() {
   const { init } = useStore();
   useEffect(() => {
+    console.log("--- init ---");
     init([7, 3, 1, 5, 2, 9, 8, 4, 6], 1);
   }, [init]);
-  return <Simple />;
+  return <InsertionSort />;
 }
 
 export default App;
